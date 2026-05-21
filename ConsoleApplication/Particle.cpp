@@ -1,6 +1,10 @@
 #pragma once
 #include <iostream>
+#include <mutex>
+#include <map>
 #include "Resources.cpp"
+
+// Particles
 
 class IParticle
 {
@@ -10,7 +14,7 @@ public:
 
 class Particle : public IParticle
 {
-private:
+protected:
 	int x;
 	int y;
 	IShader* shader;
@@ -21,27 +25,51 @@ public:
 		image(image), shader(shader), x(x), y(y)
 	{}
 
+	void setPosition(int x, int y)
+	{
+		this->x = x;
+		this->y = y;
+	}
+
 	void show() override
 	{
 		image->afficher(x, y);
 	}
 };
 
-class IParticleFactory {
-public:
-	virtual IParticle* getInitial(int x, int y) = 0;
+class IPrototype
+{
+	virtual IPrototype* clone() = 0;
 };
 
-class ParticleFactory : public IParticleFactory {
-private:
-	Image* image;
-	IShader* shader;
-
+class ParticlePrototype : public Particle, public IPrototype
+{
 public:
-	ParticleFactory(Image* image, IShader* shader) : image(image), shader(shader) {};
-	
-	IParticle* getInitial(int x, int y) override
+	ParticlePrototype(Image* image, IShader* shader, int x, int y) : 
+		Particle(image, shader, x, y) 
+	{}
+
+	bool match(Image* image, IShader* shader, int x, int y)
 	{
-		return new Particle(image, shader, x, y);
+		if ((this->image != image) 
+			|| (this->shader != shader)
+			|| (this->x != x)
+			|| (this->y != y)
+		) {
+			return false;
+		}
+		return true;
 	}
+	
+	ParticlePrototype* clone() override
+	{
+		return new ParticlePrototype(*this);
+	}
+};
+
+// Factories
+
+class IParticleFactory {
+public:
+	virtual IParticle* get(Image*, IShader*, int x, int y) = 0;
 };
