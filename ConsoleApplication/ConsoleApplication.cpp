@@ -11,4 +11,7 @@ int main()
     IShader* shader = new Shader();
     IParticleFactory* factory = new ParticleFactory(image, shader);
     factory->show(5, 1000, 1000);
+    delete image;
+    delete shader;
+    delete factory;
 }
