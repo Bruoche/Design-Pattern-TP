@@ -2,8 +2,10 @@
 //
 #pragma once
 #include <iostream>
+#include <mutex>
 #include "Resources.cpp"
 #include "Particle.cpp"
+#include "Explosion.cpp"
 
 // Elements statiques :
 
@@ -42,11 +44,13 @@ public:
 		{
 			if (prototype->match(image, shader, color))
 			{
+				std::cout << "Already existing particle requested. Cloning." << std::endl;
 				return prototype->clone();
 			}
 		}
 		ParticlePrototype* newPrototype = new ParticlePrototype(image, shader, 0, 0, 0, 0, color);
 		prototypes.push_back(newPrototype);
+		std::cout << "New prototype requested. Creating before cloning." << std::endl;
 		return newPrototype->clone();
 	}
 };
@@ -58,28 +62,9 @@ ParticleCloneFactory ParticleCloneFactory::instance;
 int main()
 {
 	IParticleFactory* factory = ParticleCloneFactory::getInstance();
-	Image* image = new Image("smoke.png");
-	IShader* shader = new Shader();	
-	std::vector<IParticle*> particles;
-	for (int i = 0; i < 5; ++i)
-	{
-		IParticle* particle = factory->get(image, shader, "110e0e");
-		particle->setVelocity(rand()%1000, rand()%1000);
-		particles.push_back(particle);
-	}
-	for (int i = 0; i < 4; ++i)
-	{
-		std::cout << "FRAME " << i << std::endl;
-		for (IParticle* particle : particles)
-		{
-			particle->show();
-			particle->physicEvent();
-		}
-	}
-	for (IParticle* particle : particles) {
-		delete particle;
-	}
-	particles.clear();
-    delete image;
-    delete shader;
+	Explosion* explosion = new Explosion(0, 0, "110e0e", 5, 1000, 1000, 4, factory);
+	explosion->play();
+	delete explosion;
+	delete factory;
+	return 0;
 }

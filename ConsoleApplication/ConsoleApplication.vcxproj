@@ -140,6 +140,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ConsoleApplication.cpp" />
+    <ClCompile Include="Explosion.cpp" />
     <ClCompile Include="Particle.cpp" />
     <ClCompile Include="Resources.cpp" />
   </ItemGroup>

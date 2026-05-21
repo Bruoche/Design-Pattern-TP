@@ -1,6 +1,5 @@
 #pragma once
 #include <iostream>
-#include <mutex>
 #include <map>
 #include "Resources.cpp"
 
@@ -91,3 +90,4 @@ class IParticleFactory {
 public:
 	virtual IParticle* get(Image*, IShader*, std::string color) = 0;
 };
+
