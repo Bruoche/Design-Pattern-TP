@@ -61,12 +61,16 @@ ParticleCloneFactory ParticleCloneFactory::instance;
 
 int main()
 {
-	IParticleFactory* factory = ParticleCloneFactory::getInstance();
-	Explosion* explosion = (new ExplosionBuilder(factory, 5, 4))
+	IParticleFactory* particleFactory = ParticleCloneFactory::getInstance();
+	ExplosionConfig* config = (new ExplosionConfigBuilder(5, 4))
 		->withColor("110e0e")
 		->withSpread(1000, 1000)
 		->build();
+	IExplosionFactory* factory = new ExplosionFactory();
+	IExplosion* explosion = factory->get(particleFactory, config);
 	explosion->play();
 	delete explosion;
+	delete factory;
+	delete config;
 	return 0;
 }
