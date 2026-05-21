@@ -9,7 +9,9 @@
 class IParticle
 {
 public:
+	virtual void setVelocity(int x, int y) = 0;
 	virtual void show() = 0;
+	virtual void physicEvent() = 0;
 };
 
 class Particle : public IParticle
@@ -17,13 +19,22 @@ class Particle : public IParticle
 protected:
 	int x;
 	int y;
+	int velocityX;
+	int velocityY;
+	std::string color; // Idieally I'd use an actual color type but it's just for POC.
 	IShader* shader;
 	Image* image;
 
 public:
-	Particle(Image* image, IShader* shader, int x, int y) : 
-		image(image), shader(shader), x(x), y(y)
+	Particle(Image* image, IShader* shader, int x, int y, int velocityX, int velocityY, std::string color) :
+		image(image), shader(shader), x(x), y(y), velocityX(velocityX), velocityY(velocityY), color(color)
 	{}
+
+	void setVelocity(int x, int y) override
+	{
+		this->velocityX = x;
+		this->velocityY = y;
+	}
 
 	void setPosition(int x, int y)
 	{
@@ -34,6 +45,13 @@ public:
 	void show() override
 	{
 		image->afficher(x, y);
+		std::cout << "-> #" << color << std::endl;
+	}
+
+	void physicEvent()
+	{
+		x += velocityX;
+		y += velocityY;
 	}
 };
 
@@ -45,16 +63,16 @@ class IPrototype
 class ParticlePrototype : public Particle, public IPrototype
 {
 public:
-	ParticlePrototype(Image* image, IShader* shader, int x, int y) : 
-		Particle(image, shader, x, y) 
+	ParticlePrototype(Image* image, IShader* shader, int x, int y, int velocityX, int velocityY, std::string color) :
+		Particle(image, shader, x, y, velocityX, velocityY, color)
 	{}
 
-	bool match(Image* image, IShader* shader, int x, int y)
+	// Check if particle style matches
+	bool match(Image* image, IShader* shader, std::string color)
 	{
 		if ((this->image != image) 
 			|| (this->shader != shader)
-			|| (this->x != x)
-			|| (this->y != y)
+			|| (this->color != color)
 		) {
 			return false;
 		}
@@ -71,5 +89,5 @@ public:
 
 class IParticleFactory {
 public:
-	virtual IParticle* get(Image*, IShader*, int x, int y) = 0;
+	virtual IParticle* get(Image*, IShader*, std::string color) = 0;
 };

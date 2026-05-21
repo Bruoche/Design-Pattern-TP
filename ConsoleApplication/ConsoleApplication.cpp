@@ -36,16 +36,16 @@ public:
 
 	// Return a clone of it's prototype particle.
 	// Return null if no corresponding prototype is found.
-	IParticle* get(Image* image, IShader* shader, int x, int y) override
+	IParticle* get(Image* image, IShader* shader, std::string color) override
 	{
 		for (ParticlePrototype* prototype : prototypes)
 		{
-			if (prototype->match(image, shader, x, y))
+			if (prototype->match(image, shader, color))
 			{
 				return prototype->clone();
 			}
 		}
-		ParticlePrototype* newPrototype = new ParticlePrototype(image, shader, x, y);
+		ParticlePrototype* newPrototype = new ParticlePrototype(image, shader, 0, 0, 0, 0, color);
 		prototypes.push_back(newPrototype);
 		return newPrototype->clone();
 	}
@@ -63,10 +63,20 @@ int main()
 	std::vector<IParticle*> particles;
 	for (int i = 0; i < 5; ++i)
 	{
-		particles.push_back(factory->get(image, shader, rand() % 1000, rand() % 1000));
+		IParticle* particle = factory->get(image, shader, "110e0e");
+		particle->setVelocity(rand()%1000, rand()%1000);
+		particles.push_back(particle);
+	}
+	for (int i = 0; i < 4; ++i)
+	{
+		std::cout << "FRAME " << i << std::endl;
+		for (IParticle* particle : particles)
+		{
+			particle->show();
+			particle->physicEvent();
+		}
 	}
 	for (IParticle* particle : particles) {
-		particle->show();
 		delete particle;
 	}
 	particles.clear();
