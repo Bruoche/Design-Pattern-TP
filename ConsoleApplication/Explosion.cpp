@@ -25,13 +25,13 @@ public:
 	Explosion(
 		int x, int y,
 		std::string color, int particleCount,
-		int velocityX, int velocityY,
+		int spreadX, int spreadY,
 		int lifetime,
 		IParticleFactory* factory
 	) : // Explosion est un objet immuable, donc seul le constructeur permettra de set ses champs. 
 		x(x), y(y), 
 		color(color), particleCount(particleCount), 
-		spreadX(velocityX), spreadY(velocityY), 
+		spreadX(spreadX), spreadY(spreadY), 
 		lifetime(lifetime)
 	{
 		std::cout << "Building explosion..." << std::endl;
@@ -65,5 +65,46 @@ public:
 				particle->physicEvent();
 			}
 		}
+	}
+};
+
+class ExplosionBuilder
+{
+private:
+	int x = 0;
+	int y = 0;
+	std::string color = "000000";
+	int particleCount;
+	int spreadX = 0;
+	int spreadY = 0;
+	int lifetime;
+	IParticleFactory* factory;
+
+public:
+	ExplosionBuilder(IParticleFactory* factory, int particleCount, int lifetime) : factory(factory), particleCount(particleCount), lifetime(lifetime) {}
+
+	ExplosionBuilder* withCoordinates(int x, int y) 
+	{
+		this->x = x;
+		this->y = y;
+		return this;
+	}
+
+	ExplosionBuilder* withColor(std::string color)
+	{
+		this->color = color;
+		return this;
+	}
+
+	ExplosionBuilder* withSpread(int x, int y) 
+	{
+		this->spreadX = x;
+		this->spreadY = y;
+		return this;
+	}
+
+	Explosion* build()
+	{
+		return new Explosion(x, y, color, particleCount, spreadX, spreadY, lifetime, factory);
 	}
 };
